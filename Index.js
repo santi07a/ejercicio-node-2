@@ -4,10 +4,15 @@ const fetch = require("node-fetch");
 const chalk = require("chalk");
 const preguntas = require("./utilidades/Preguntas");
 
+let mensaje;
+
 inquirer.prompt(preguntas).then(respuestas => {
   if (respuestas.transporte === "Bus") {
     console.log(chalk.yellow("No hay información disponible sobre autobuses."));
     process.exit(0);
+  }
+  if (respuestas.errores === true) {
+    mensaje = chalk.red.bold("La línea no existe");
   }
 });
 
