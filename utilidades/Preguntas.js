@@ -13,7 +13,7 @@ const preguntas = [
         name: "bus",
         value: "Bus"
       }
-    ]
+    ],
   },
   {
     type: "checkbox",
@@ -34,12 +34,15 @@ const preguntas = [
   {
     type: "confirm",
     message: "¿Quiere que le informemos de los errores?",
-    name: "errores"
+    name: "errores",
+    when: respuestas => respuestas.transporte === "Metro"
+
   },
   {
     type: "input",
     message: " ¿Qué línea quiere consultar?",
-    name: "linea"
+    name: "linea",
+    when: respuestas => respuestas.transporte === "Metro"
   }
 ];
 
