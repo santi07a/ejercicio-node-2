@@ -6,6 +6,14 @@ const chalk = require("chalk");
 const preguntas = require("./utilidades/Preguntas");
 
 let mensaje;
+program
+  .option("-c, --color <color>", "introduce un color en hexadecimal")
+  .option("-a, --abrev", "Quieres Abreviar?", false);
+
+program.parse(process.argv);
+
+const options = program.opts();
+const { color, abrev } = options;
 
 inquirer.prompt(preguntas).then(respuestas => {
   if (respuestas.transporte === "Bus") {
@@ -28,6 +36,11 @@ inquirer.prompt(preguntas).then(respuestas => {
             colorMensaje = `#${linea.properties.COLOR_LINIA}`;
           }
           console.log(chalk.hex(colorMensaje)(`Línea ${linea.properties.NOM_LINIA}. ${linea.properties.DESC_LINIA}`));
+          fetch(`${process.env.TMB_API_PARADAS + respuestas.linea.slice(1)}/estacions?${process.env.TMB_API_KEY}`)
+            .then(resp => resp.json())
+            .then(datosLinea => {
+              console.log(datosLinea.features.map(linea => linea.properties.NOM_ESTACIO));
+            });
         } else {
           console.log(mensaje);
           process.exit(0);
@@ -35,12 +48,3 @@ inquirer.prompt(preguntas).then(respuestas => {
       });
   }
 });
-
-program
-  .option("-c, --color <color>", "introduce un color en hexadecimal")
-  .option("-a, --abrev", "Quieres Abreviar?", false);
-
-program.parse(process.argv);
-
-const options = program.opts();
-const { color, abrev } = options;
