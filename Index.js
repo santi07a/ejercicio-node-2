@@ -5,10 +5,6 @@ const fetch = require("node-fetch");
 const chalk = require("chalk");
 const preguntas = require("./utilidades/Preguntas");
 
-const datos = fetch(process.env.TMB_API_LINEAS)
-  .then(resp => resp.json())
-  .then(datos => datos);
-
 let mensaje;
 
 inquirer.prompt(preguntas).then(respuestas => {
@@ -19,11 +15,24 @@ inquirer.prompt(preguntas).then(respuestas => {
   if (respuestas.errores === true) {
     mensaje = chalk.red.bold("La línea no existe");
   }
-
-  if (respuestas.linea === datos.features.properties.NOM_LINIA) {
-    if (color) {
-      console.log(chalk.hex(color)(`Línea ${respuestas.linea}.`));
-    }
+  if (respuestas.linea) {
+    fetch(process.env.TMB_API_LINEAS)
+      .then(resp => resp.json())
+      .then(datos => {
+        const linea = datos.features.find(linia => linia.properties.NOM_LINIA === respuestas.linea);
+        if (linea) {
+          let colorMensaje;
+          if (color) {
+            colorMensaje = color;
+          } else {
+            colorMensaje = `#${linea.properties.COLOR_LINIA}`;
+          }
+          console.log(chalk.hex(colorMensaje)(`Línea ${linea.properties.NOM_LINIA}. ${linea.properties.DESC_LINIA}`));
+        } else {
+          console.log(mensaje);
+          process.exit(0);
+        }
+      });
   }
 });
 
