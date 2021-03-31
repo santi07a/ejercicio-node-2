@@ -39,16 +39,28 @@ inquirer.prompt(preguntas).then(respuestas => {
           fetch(`${process.env.TMB_API_PARADAS + respuestas.linea.slice(1)}/estacions?${process.env.TMB_API_KEY}`)
             .then(resp => resp.json())
             .then(datosLinea => {
-              if (abrev) {
-                // Probé agregando chalk para que fuera del mismo color las paradas pero: queda feo y además se ponen una al lado del otra, es mejor dejarlas así
-                console.log(datosLinea.features.map(linea => `${linea.properties.NOM_ESTACIO.slice(0, 3)}.`));
+              if (respuestas.informacion.includes("Fecha")) {
+                if (abrev) {
+                  // Probé agregando chalk para que fuera del mismo color las paradas pero: queda feo y además se ponen una al lado del otra, es mejor dejarlas así
+                  console.log(datosLinea.features
+                    .map(linea => `${linea.properties.NOM_ESTACIO.slice(0, 3)}. inauguración: ${linea.properties.DATA_INAUGURACIO.slice(0, -1)}`));
+                } else {
+                  console.log(datosLinea.features
+                    .map(linea => `${linea.properties.NOM_ESTACIO}, inauguración: ${linea.properties.DATA_INAUGURACIO.slice(0, -1)}`));
+                }
+              } else if (respuestas.informacion.includes("Coordenadas")) {
+                if (abrev) {
+                  console.log(datosLinea.features
+                    .map(linea => `${linea.properties.NOM_ESTACIO.slice(0, 3)}. Coordinadas: ${linea.geometry.coordinates} `));
+                } else {
+                  console.log(datosLinea.features
+                    .map(linea => `${linea.properties.NOM_ESTACIO}, Coordinadas: ${linea.geometry.coordinates} `));
+                }
               } else {
-                console.log(datosLinea.features.map(linea => linea.properties.NOM_ESTACIO));
+                console.log(mensaje);
+                process.exit(0);
               }
             });
-        } else {
-          console.log(mensaje);
-          process.exit(0);
         }
       });
   }
